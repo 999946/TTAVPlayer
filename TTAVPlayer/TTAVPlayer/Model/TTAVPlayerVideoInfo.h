@@ -14,4 +14,6 @@
 
 @property (nonatomic,strong) NSString *videoTitle;
 
+@property (nonatomic,strong) NSString *placeholderImage;
+
 @end

@@ -20,6 +20,7 @@
 #import "TTAVPlayerSwipeHandlerView.h"
 #import "TTAVPlayerInfoChangeView.h"
 #import "TTAVPlayerLoadingView.h"
+#import "UIImageView+ZFCache.h"
 
 @interface TTAVPlayerView ()
 
@@ -84,6 +85,8 @@
 @property (nonatomic,strong) TTAVPlayerTimeLabel *totalTimeLabel;
 
 @property (nonatomic,strong) TTAVPlayerLoadingView *loadingView;
+
+@property (nonatomic, strong) UIImageView *placeholderImageView;
 
 // PortraitMode + NormalMode
 

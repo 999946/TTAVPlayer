@@ -82,7 +82,7 @@ static char directionAssoKey;
     if ([self.delegate respondsToSelector:@selector(videoUIDidLoad)]){
         [self.delegate videoUIDidLoad];
     }
-
+    
 }
 
 //上下操作栏的高度为50.0f
@@ -107,7 +107,7 @@ static char directionAssoKey;
     self.titleLabel.hidden = YES;
     self.volumeView.hidden = YES;
     self.infoChangeView.hidden = YES;
-    self.closeBtn.hidden = NO;
+    self.closeBtn.hidden = YES;
     
     self.videoView.frame = self.bounds;
     
@@ -264,18 +264,23 @@ static char directionAssoKey;
 
 - (void)setupBottomControlView{
     CGFloat width = self.bounds.size.width;
+#warning Godot fix
+    //    self.playBtn.frame = CGRectMake(0.0f, 0.0f, 50.0f, 50.0f);
+    //
+    //    self.currentTimeLabel.origin = CGPointMake(self.playBtn.right, (self.bottomControlView.height - self.currentTimeLabel.height)/2);
+    //
+    //    self.slider.frame = CGRectMake(self.currentTimeLabel.right + 10.0f,(self.bottomControlView.height - 10.0f)/2 , width - 50.0f * 2 - self.currentTimeLabel.width - self.totalTimeLabel.width - 20.0f, 10.0f);
+    //  end
     
-    self.playBtn.frame = CGRectMake(0.0f, 0.0f, 50.0f, 50.0f);
+    self.currentTimeLabel.origin = CGPointMake(15, (self.bottomControlView.height - self.currentTimeLabel.height)/2);
     
-    self.currentTimeLabel.origin = CGPointMake(self.playBtn.right, (self.bottomControlView.height - self.currentTimeLabel.height)/2);
-    
-    self.slider.frame = CGRectMake(self.currentTimeLabel.right + 10.0f,(self.bottomControlView.height - 10.0f)/2 , width - 50.0f * 2 - self.currentTimeLabel.width - self.totalTimeLabel.width - 20.0f, 10.0f);
+    self.slider.frame = CGRectMake(self.currentTimeLabel.right + 10.0f,(self.bottomControlView.height - 10.0f)/2 , width - 50.0f - self.currentTimeLabel.width - self.totalTimeLabel.width - 20.0f, 10.0f);
     
     self.totalTimeLabel.origin = CGPointMake(self.slider.right + 10.0f, (self.bottomControlView.height - self.totalTimeLabel.height)/2);
     
     self.currentTimeLabel.hidden = NO;
     self.totalTimeLabel.hidden = NO;
-
+    
     self.fullScreenBtn.frame = CGRectMake(width - 50.0f, 0.0f, 50.0f, 50.0f);
 }
 
@@ -315,6 +320,11 @@ static char directionAssoKey;
     self.clipsToBounds = YES;
     [self addSubview:self.videoView];
     
+    self.placeholderImageView = [[UIImageView alloc] init];
+    self.placeholderImageView.frame = CGRectMake(0.0f, 0.0f, self.width, self.height);
+    [self.placeholderImageView setImageWithURLString:self.videoInfo.placeholderImage placeholder:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_placeholder.png"]];
+    [self.videoView addSubview:self.placeholderImageView];
+    
     self.loadingView = [[TTAVPlayerLoadingView alloc]initWithFrame:CGRectZero];
     self.loadingView.hidden = YES;
     [self.videoView addSubview:self.loadingView];
@@ -349,8 +359,13 @@ static char directionAssoKey;
     self.playBtn.imageEdgeInsets = UIEdgeInsetsMake(edgeInset, edgeInset, edgeInset, edgeInset);
     [self.playBtn setImage:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_avplayer_pause"] forState:UIControlStateNormal];
     [self.playBtn setImage:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_avplayer_play"] forState:UIControlStateSelected];
+    self.playBtn.selected = YES;
     [self.playBtn addTarget:self action:@selector(clickPlayBtn) forControlEvents:UIControlEventTouchDown];
-    [self.bottomControlView addSubview:self.playBtn];
+#warning Godot fix
+//    [self.bottomControlView addSubview:self.playBtn];
+    [self addSubview:self.playBtn];
+    self.playBtn.frame = CGRectMake(self.bounds.size.width/2-25, self.bounds.size.height/2-25, 50.0f, 50.0f);
+    //  end
     
     self.currentTimeLabel = [[TTAVPlayerTimeLabel alloc]init];
     [self.currentTimeLabel setText:@"00:00 "];//防止出现计算bug，多出一个空格距离
@@ -365,7 +380,7 @@ static char directionAssoKey;
     self.totalTimeLabel.hidden = YES;
     [self.bottomControlView addSubview:self.totalTimeLabel];
     
-
+    
     self.slider = [[TTAVPlayerSlider alloc]init];
     [self.slider addTarget:self action:@selector(seek:) forControlEvents:UIControlEventValueChanged];
     [self.slider addTarget:self action:@selector(pauseRefreshProgressSlider) forControlEvents:UIControlEventTouchDown];
@@ -408,7 +423,6 @@ static char directionAssoKey;
     
     self.volumeView = [[MPVolumeView alloc]initWithFrame:CGRectMake(-1000.0f, 0.0f, 0.0f, 0.0f)];
     [self addSubview:self.volumeView];
-    
 }
 
 #pragma mark - ViewMode Change
@@ -472,11 +486,15 @@ static char directionAssoKey;
         self.isShowControlViewAnimated = YES;
         
         [UIView animateWithDuration:0.5f animations:^{
+#warning fix
+            self.playBtn.alpha = 0;
+            // end
             self.headControlView.top -= 50.0f;
             self.bottomControlView.bottom += 50.0f;
         } completion:^(BOOL finished) {
             self.headControlView.hidden = YES;
             self.bottomControlView.hidden = YES;
+            self.playBtn.hidden = YES;
             self.isHideControlViews = YES;
             
             self.headControlView.frame = CGRectMake(0.0f, -50.0f, width, 50.0f);
@@ -489,7 +507,7 @@ static char directionAssoKey;
         self.headControlView.hidden = YES;
         self.bottomControlView.hidden = YES;
         self.isHideControlViews = YES;
-        
+        self.playBtn.hidden = YES;
         self.headControlView.frame = CGRectMake(0.0f, -50.0f, width, 50.0f);
         self.bottomControlView.frame = CGRectMake(0.0f, self.videoView.bounds.size.height, width, 50.0f);
     }
@@ -508,12 +526,16 @@ static char directionAssoKey;
         self.isShowControlViewAnimated = YES;
         self.headControlView.hidden = NO;
         self.bottomControlView.hidden = NO;
+#warning fix
+        self.playBtn.hidden = NO;
+        //
         self.isHideControlViews = NO;
         
         [UIView animateWithDuration:0.5f animations:^{
             
             self.headControlView.bottom += 50.0f;
             self.bottomControlView.top -= 50.0f;
+            self.playBtn.alpha = 1;
             
         } completion:^(BOOL finished) {
             

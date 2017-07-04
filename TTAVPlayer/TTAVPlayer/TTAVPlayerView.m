@@ -145,7 +145,9 @@
         [self showNOWifiAlert];
         return;
     }
+    [self hidePlaceholderImageView];
     [self hideErrorView];
+    [self hidePlayBtn];
     [self showLoadingIndicator];
     
     if (STRING_IS_BLANK(self.videoUrl)){
@@ -176,6 +178,7 @@
 - (void)stop{
     [self.playBtn setSelected:YES];
     _isPlaying = NO;
+    [self showPlaceholderImageView];
     [self.player pause];
 }
 
@@ -201,6 +204,8 @@
         [UIView animateWithDuration:0.2 animations:^{
             self.transform = CGAffineTransformMakeRotation(M_PI/2);
             self.frame = CGRectMake(0, 0 , [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height);
+            self.playBtn.frame = CGRectMake(self.bounds.size.width/2-25, self.bounds.size.height/2-25, 50.0f, 50.0f);
+            self.placeholderImageView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
             self.videoView.frame = self.bounds;
             if (self.viewMode != TTAVPlayerViewUserDefineMode){
                 [self changeToLandScapeMode];
@@ -219,6 +224,8 @@
             [[UIApplication sharedApplication] setStatusBarHidden:NO withAnimation:YES];
             self.transform = CGAffineTransformIdentity;
             self.frame = self.originFrame;
+            self.playBtn.frame = CGRectMake(self.bounds.size.width/2-25, self.bounds.size.height/2-25, 50.0f, 50.0f);
+            self.placeholderImageView.frame = CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
             if (self.viewMode != TTAVPlayerViewUserDefineMode){
                 [self backToOriginViewMode];
                 if ([self.delegate respondsToSelector:@selector(onVideoNormalScreen)]){
@@ -292,6 +299,22 @@
     self.errorView.hidden = NO;
 }
 
+- (void)showPlaceholderImageView{
+    if([self.placeholderImageView isHidden]) {
+        self.placeholderImageView.hidden = NO;
+    }
+}
+
+- (void)hidePlaceholderImageView{
+    if(![self.placeholderImageView isHidden]) {
+        self.placeholderImageView.hidden = YES;
+    }
+}
+
+- (void)hidePlayBtn{
+    self.playBtn.hidden = YES;
+}
+
 - (void)showLoadingIndicator{
     self.loadingView.hidden = NO;
 }
@@ -342,6 +365,7 @@
 //播放完成
 - (void)playerFinished{
     [self hideErrorView];
+    [self showPlaceholderImageView];
     __weak typeof(self) weakSelf = self;
     [self.player seekToTime:kCMTimeZero toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero completionHandler:^(BOOL finished) {
         
@@ -411,6 +435,21 @@
 - (void)playerCanPlay{
     [self playViewDidPlayWithPreload:YES];
     [self afterPlayerLoadTreatment];
+}
+
+// 获取视频第一帧
+- (UIImage*) getVideoPreViewImage:(NSURL *)path {
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:path options:nil];
+    AVAssetImageGenerator *assetGen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    
+    assetGen.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [assetGen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *videoImage = [[UIImage alloc] initWithCGImage:image];
+    CGImageRelease(image);
+    return videoImage;
 }
 
 @end
