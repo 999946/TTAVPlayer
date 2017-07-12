@@ -6,8 +6,8 @@
 //  Copyright © 2017年 dylan.tang. All rights reserved.
 //
 
-#import "TTAVPlayerVideoInfo.h"
+#import "TTAVPlayerVideoProps.h"
 
-@implementation TTAVPlayerVideoInfo
+@implementation TTAVPlayerVideoProps
 
 @end

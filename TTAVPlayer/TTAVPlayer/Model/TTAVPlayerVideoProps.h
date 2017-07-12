@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface TTAVPlayerVideoInfo : NSObject
+@interface TTAVPlayerVideoProps : NSObject
 
 @property (nonatomic,strong) NSString *videoUrl;
 

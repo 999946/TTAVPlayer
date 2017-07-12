@@ -102,7 +102,7 @@ static char directionAssoKey;
     self.headControlView.hidden = NO;
     self.bottomControlView.hidden = NO;
     
-    self.backBtn.hidden = YES;
+    self.backBtn.hidden = NO;
     self.handleSwipeView.hidden = YES;
     self.titleLabel.hidden = YES;
     self.volumeView.hidden = YES;
@@ -111,12 +111,15 @@ static char directionAssoKey;
     
     self.videoView.frame = self.bounds;
     
+    self.placeholderImageView.frame = CGRectMake(0, 0, self.videoView.width, self.videoView.height);
     self.loadingView.frame = CGRectMake((self.videoView.width - 30.0f)/2, (self.videoView.height - 30.0f)/2, 30.0f, 30.0f);
+    self.playBtn.frame = CGRectMake((self.videoView.width - 50.0f)/2, (self.videoView.height - 50.0f)/2, 50.0f, 50.0f);
     
     self.errorView.frame = self.videoView.bounds;
     
     self.headControlView.frame = CGRectMake(0.0f, 0.0f, self.width, 50.0f);
     
+    self.backBtn.frame = CGRectMake(0.0f, 0.0f, 50.0f, 50.0f);
     self.closeBtn.frame = CGRectMake(self.headControlView.width - 50.0f, 0.0f, 50.0f, 50.0f);
     
     self.bottomControlView.frame = CGRectMake(0.0f, self.videoView.height - 50.0f, self.width, 50.0f);
@@ -159,9 +162,9 @@ static char directionAssoKey;
     self.closeBtn.hidden = NO;
     
     self.videoView.frame = CGRectMake(0.0f, (self.height - self.width * screenRate)/2, self.width, self.width * screenRate);
-    
+    self.placeholderImageView.frame = CGRectMake(0, 0, self.videoView.width, self.videoView.height);
     self.loadingView.frame = CGRectMake((self.videoView.width - 30.0f)/2, (self.videoView.height - 30.0f)/2, 30.0f, 30.0f);
-    
+    self.playBtn.frame = CGRectMake((self.videoView.width - 50.0f)/2, (self.videoView.height - 50.0f)/2, 50.0f, 50.0f);
     self.errorView.frame = self.videoView.bounds;
     
     CGFloat statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -264,7 +267,6 @@ static char directionAssoKey;
 
 - (void)setupBottomControlView{
     CGFloat width = self.bounds.size.width;
-#warning Godot fix
     //    self.playBtn.frame = CGRectMake(0.0f, 0.0f, 50.0f, 50.0f);
     //
     //    self.currentTimeLabel.origin = CGPointMake(self.playBtn.right, (self.bottomControlView.height - self.currentTimeLabel.height)/2);
@@ -321,8 +323,10 @@ static char directionAssoKey;
     [self addSubview:self.videoView];
     
     self.placeholderImageView = [[UIImageView alloc] init];
-    self.placeholderImageView.frame = CGRectMake(0.0f, 0.0f, self.width, self.height);
-    [self.placeholderImageView setImageWithURLString:self.videoInfo.placeholderImage placeholder:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_placeholder.png"]];
+    self.placeholderImageView.autoresizesSubviews = YES;
+//    [self.placeholderImageView setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+//    self.placeholderImageView.frame = CGRectMake(0.0f, 0.0f, self.width, self.height);
+    [self.placeholderImageView setImageWithURLString:self.placeholderImage placeholder:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_placeholder.png"]];
     [self.videoView addSubview:self.placeholderImageView];
     
     self.loadingView = [[TTAVPlayerLoadingView alloc]initWithFrame:CGRectZero];
@@ -361,11 +365,7 @@ static char directionAssoKey;
     [self.playBtn setImage:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_avplayer_play"] forState:UIControlStateSelected];
     self.playBtn.selected = YES;
     [self.playBtn addTarget:self action:@selector(clickPlayBtn) forControlEvents:UIControlEventTouchDown];
-#warning Godot fix
-//    [self.bottomControlView addSubview:self.playBtn];
     [self addSubview:self.playBtn];
-    self.playBtn.frame = CGRectMake(self.bounds.size.width/2-25, self.bounds.size.height/2-25, 50.0f, 50.0f);
-    //  end
     
     self.currentTimeLabel = [[TTAVPlayerTimeLabel alloc]init];
     [self.currentTimeLabel setText:@"00:00 "];//防止出现计算bug，多出一个空格距离
@@ -486,7 +486,6 @@ static char directionAssoKey;
         self.isShowControlViewAnimated = YES;
         
         [UIView animateWithDuration:0.5f animations:^{
-#warning fix
             self.playBtn.alpha = 0;
             // end
             self.headControlView.top -= 50.0f;
@@ -526,7 +525,6 @@ static char directionAssoKey;
         self.isShowControlViewAnimated = YES;
         self.headControlView.hidden = NO;
         self.bottomControlView.hidden = NO;
-#warning fix
         self.playBtn.hidden = NO;
         //
         self.isHideControlViews = NO;
@@ -675,6 +673,16 @@ static char directionAssoKey;
 - (void)setDirection:(TTAVPlayerSwipeDirection)direction{
     NSNumber *directionNum = [NSNumber numberWithInteger:direction];
     objc_setAssociatedObject(self, &directionAssoKey, directionNum, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+#pragma mark - props setter
+
+- (void)setPlaceholderImage:(NSString *)placeholderImage {
+    [self.placeholderImageView setImageWithURLString:placeholderImage placeholder:[UIImage imageNamed:@"TTAVPlayer.bundle/multimedia_placeholder.png"]];
+}
+
+- (void)setVideoTitle:(NSString *)videoTitle {
+    [self.titleLabel setText:videoTitle];
 }
 
 

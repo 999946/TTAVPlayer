@@ -30,12 +30,11 @@
     return self;
 }
 
-- (instancetype)initWithFrame:(CGRect)frame withVideoInfo:(TTAVPlayerVideoInfo *)videoInfo withViewMode:(TTAVPlayerViewMode)mode{
+- (instancetype)initWithFrame:(CGRect)frame withVideoInfo:(TTAVPlayerVideoProps *)props withViewMode:(TTAVPlayerViewMode)mode{
     self = [super initWithFrame:frame];
     if (self){
-        self.videoInfo = videoInfo;
+        [self initParams:props];
         self.viewMode = mode;
-        [self initParams];
         [self setupUIWithViewMode:mode];
     }
     return self;
@@ -46,14 +45,10 @@
 }
 
 #pragma mark - init
-
-- (void)initParams{
-    self.videoUrl = self.videoInfo.videoUrl;
-    self.videoTitle = self.videoInfo.videoTitle;
-}
-
-- (void)setup{
-    [self initParams];
+- (void)initParams:(TTAVPlayerVideoProps *)props{
+    self.videoUrl = props.videoUrl;
+    self.videoTitle = props.videoTitle;
+    self.placeholderImage = props.placeholderImage;
 }
 
 #pragma mark - network
@@ -156,6 +151,9 @@
     
     if (!self.player){
         [self loadPlayer];
+        if ([self.delegate respondsToSelector:@selector(videoDidPlay)]){
+            [self.delegate videoDidPlay];
+        }
         return;
     }
     
@@ -173,6 +171,9 @@
     [self.playBtn setSelected:YES];
     [self.player pause];
     _isPlaying = NO;
+    if ([self.delegate respondsToSelector:@selector(videoDidPause)]){
+        [self.delegate videoDidPause];
+    }
 }
 
 - (void)stop{
@@ -185,6 +186,11 @@
 - (void)replay{
     [self play];
 }
+
+- (void)reloadVideo {
+    [self clean];
+    [self play];
+};
 
 - (void)seekToTime:(CMTime)time completionHandler:(void(^)(BOOL))completionHandler{
     //    [self.player seekToTime:time];这种方法会有误差，详见官方文档:The time seeked to may differ from the specified time for efficiency. For sample accurate seeking see seekToTime:toleranceBefore:toleranceAfter
@@ -254,7 +260,6 @@
         weakSelf.player.delegate = weakSelf;
         weakSelf.currentItem = weakSelf.player.currentItem;
         weakSelf.totalTime = weakSelf.currentItem.asset.duration.value / weakSelf.currentItem.asset.duration.timescale;
-        
         [weakSelf setupNotificationObserver];
         [weakSelf setupPlayerObserver];
         [weakSelf setupNetworkStatusHandler];
@@ -430,6 +435,8 @@
     [self hideErrorView];
     [self hideLoadingIndicator];
 }
+
+
 
 //item初始化成功，可以播放
 - (void)playerCanPlay{

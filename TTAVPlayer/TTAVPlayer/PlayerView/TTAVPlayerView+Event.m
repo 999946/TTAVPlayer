@@ -85,9 +85,13 @@ static char timeSetAssoKey;
 }
 
 - (void)clickBackBtn{
-    
     [self hideControlViewAniamted:NO];
-    [self toggleFullScreen];
+    if(self.isFullScreen) {
+        [self toggleFullScreen];
+    }
+    if ([self.delegate respondsToSelector:@selector(backButtonGetTap:)]){
+        [self.delegate backButtonGetTap:self.isFullScreen];
+    }
 }
 
 - (void)tapVideoView{
@@ -135,11 +139,11 @@ static char timeSetAssoKey;
         NSDate *currentTime = [NSDate dateWithTimeIntervalSince1970:current];
         NSString *timeString = [self.dateFormatter stringFromDate:currentTime];
         [self.currentTimeLabel setText:timeString];
-        if (!self.isTotalTimeLabelSet){
+//        if (!self.isTotalTimeLabelSet){
             NSDate *totalTime = [NSDate dateWithTimeIntervalSince1970:duration];
             [self.totalTimeLabel setText:[self.dateFormatter stringFromDate:totalTime]];
-            self.isTotalTimeLabelSet = YES;
-        }
+//            self.isTotalTimeLabelSet = YES;
+//        }
         [self.slider setUserInteractionEnabled:YES];
     }
 }

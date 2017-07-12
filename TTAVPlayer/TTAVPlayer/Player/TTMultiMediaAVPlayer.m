@@ -120,7 +120,7 @@
     if (([self.url.absoluteString hasPrefix:@"http:"] || [self.url.absoluteString hasPrefix:@"https:"]) && [reach currentReachabilityStatus] == TTAVPlayerNotReachable) {
         
         NSDictionary *userInfo = [NSDictionary dictionaryWithObject:@"您的网络不可用，请稍后再尝试"                                                                      forKey:NSLocalizedDescriptionKey];
-        NSError *aError = [NSError errorWithDomain:@"fliggy.com" code:TTMultiMediaAVPlayerErrorNoNetwork userInfo:userInfo];
+        NSError *aError = [NSError errorWithDomain:@"baidu.com" code:TTMultiMediaAVPlayerErrorNoNetwork userInfo:userInfo];
         self.playerStatus   = TTMultiMediaAVPlayerStatusError;
         [self.delegate playerError:aError];
         return;
@@ -136,6 +136,7 @@
         [super play];
     }
 }
+
 -(void)playerError:(NSError*)error {
     __weak typeof (self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -154,6 +155,7 @@
 -(void)stop {
     [self stop];
 }
+
 - (void)seekToTime:(CMTime)time {
     NSLog(@"%s,%d,%2lld",__func__,__LINE__,time.value/time.timescale);
     [super seekToTime:time];;

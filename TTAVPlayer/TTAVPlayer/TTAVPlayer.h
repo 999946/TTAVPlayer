@@ -10,6 +10,6 @@
 #define TTAVPlayer_h
 
 #import "TTAVPlayerView.h"
-#import "TTAVPlayerVideoInfo.h"
+#import "TTAVPlayerVideoProps.h"
 
 #endif /* TTAVPlayer_h */

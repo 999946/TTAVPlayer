@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import "TTAVPlayerVideoInfo.h"
+#import "TTAVPlayerVideoProps.h"
 
 
 @class TTAVPlayerView;
@@ -37,6 +37,8 @@ typedef NS_ENUM(NSInteger, TTAVPlayerViewNetworkStatus) {
 - (void)videoViewDidGetTap;
 
 - (void)closeButtonGetTap;
+
+- (void)backButtonGetTap:(BOOL)isFullScreen;
 
 // Video LifeCycle
 
@@ -82,7 +84,7 @@ typedef NS_ENUM(NSInteger, TTAVPlayerViewNetworkStatus) {
 
 - (instancetype)initWithFrame:(CGRect)frame withViewMode:(TTAVPlayerViewMode)mode;
 
-- (instancetype)initWithFrame:(CGRect)frame withVideoInfo:(TTAVPlayerVideoInfo*)videoInfo withViewMode:(TTAVPlayerViewMode)mode;
+- (instancetype)initWithFrame:(CGRect)frame withVideoInfo:(TTAVPlayerVideoProps*)props withViewMode:(TTAVPlayerViewMode)mode;
 
 #pragma mark - 播放器基础控制方法
 
@@ -93,6 +95,8 @@ typedef NS_ENUM(NSInteger, TTAVPlayerViewNetworkStatus) {
 - (void)seekToTime:(CMTime)time completionHandler:(void (^)(BOOL finished))completionHandler;
 
 - (void)replay;
+
+- (void)reloadVideo;
 
 - (void)stop;
 
@@ -118,6 +122,6 @@ typedef NS_ENUM(NSInteger, TTAVPlayerViewNetworkStatus) {
 
 @property (nonatomic, strong) NSString *videoTitle;
 
-@property (nonatomic, strong) TTAVPlayerVideoInfo *videoInfo;
+@property (nonatomic,strong) NSString *placeholderImage;
 
 @end

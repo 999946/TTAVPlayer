@@ -31,4 +31,8 @@
 
 - (void)toggleAutoHideOperationView;
 
+- (void)setPlaceholderImage:(NSString *)placeholderImage;
+
+- (void)setVideoTitle:(NSString *)videoTitle;
+
 @end
